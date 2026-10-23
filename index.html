@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindPlay — Multi-Modal Early Alzheimer's Screening System</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 antialiased selection:bg-teal-500 selection:text-white">
+
+  <!-- Main App Shell -->
+  <div id="main-app-wrapper" class="min-h-screen flex flex-col bg-slate-50 transition-all duration-300">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm print-hide">
+      <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        
+        <!-- Logo & Branding -->
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.MindPlayApp && window.MindPlayApp.restart()">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 to-cyan-500 flex items-center justify-center text-white text-xl shadow-md">
+            🧠
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-lg sm:text-xl text-slate-800 tracking-tight" data-i18n="appName">MindPlay</span>
+              <span class="hidden sm:inline-block bg-teal-50 text-teal-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-teal-200" data-i18n="dexathonBadge">
+                Dexathon 2026 | Team Technova
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 hidden sm:block" data-i18n="tagline">Multi-Modal Early Cognitive Screening</p>
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex items-center gap-2">
+          
+          <!-- Viewport Mode Toggle (Mobile Simulator vs Desktop) -->
+          <button 
+            id="viewport-toggle-btn"
+            type="button"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm cursor-pointer"
+            title="Toggle Mobile App Frame View"
+          >
+            📱 <span class="hidden sm:inline">Mobile Frame</span>
+          </button>
+
+          <!-- Language Switcher (EN <-> தமிழ்) -->
+          <button 
+            id="lang-toggle-btn"
+            type="button"
+            class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition shadow-sm cursor-pointer flex items-center gap-1"
+          >
+            தமிழ்
+          </button>
+
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6">
+
+      <!-- ========================================== -->
+      <!-- STEP 0: HOME / LANDING SCREEN              -->
+      <!-- ========================================== -->
+      <section id="step-home" class="step-section">
+        
+        <!-- Hero Banner -->
+        <div class="bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl mb-6 relative overflow-hidden">
+          <div class="relative z-10 max-w-2xl">
+            <span class="inline-block bg-teal-500/30 backdrop-blur-sm text-teal-200 text-xs font-bold px-3 py-1 rounded-full mb-3 border border-teal-400/30">
+              Dexathon 2026 • Team Technova • ID: DEX26056
+            </span>
+            <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3 leading-tight" data-i18n="heroTitle">
+              Early Alzheimer's & Cognitive Health Screening at Home
+            </h1>
+            <p class="text-teal-100 text-sm sm:text-base mb-6 leading-relaxed" data-i18n="heroSubtitle">
+              A gentle, playful 10-minute multi-modal assessment combining interactive cognitive games, speech biomarker analysis, and wearable motor/pulse monitoring.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button 
+                id="btn-start-screening" 
+                type="button"
+                class="bg-white text-teal-900 hover:bg-teal-50 font-bold px-6 py-3.5 rounded-2xl shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer text-center text-sm sm:text-base flex items-center justify-center gap-2"
+              >
+                <span>🚀</span>
+                <span data-i18n="startAssessment">Start Screening Assessment</span>
+              </button>
+
+              <button 
+                id="btn-view-sensors-direct" 
+                type="button"
+                class="bg-teal-900/60 hover:bg-teal-900/80 text-white border border-teal-400/40 font-semibold px-5 py-3.5 rounded-2xl transition cursor-pointer text-center text-sm flex items-center justify-center gap-2"
+              >
+                <span>⌚</span>
+                <span data-i18n="viewSensors">View Live Sensor Data</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Decorative Accent -->
+          <div class="absolute -right-12 -bottom-12 text-white/5 text-[180px] pointer-events-none select-none font-black">
+            🧠
+          </div>
+        </div>
+
+        <!-- Screening Notice -->
+        <div class="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded-2xl text-xs sm:text-sm font-medium flex items-center gap-2.5 mb-8 shadow-sm">
+          <span class="text-lg">ℹ️</span>
+          <span data-i18n="screeningNotice">Screening & Triaging Aid Only — Not a Formal Clinical Diagnosis</span>
+        </div>
+
+        <!-- The 3 Pillars Section -->
+        <div class="mb-8">
+          <h2 class="text-base sm:text-lg font-bold text-slate-800 mb-4" data-i18n="pillarsTitle">
+            The Three Pillars of MindPlay
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- Pillar 1 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+              <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-2xl mb-3">
+                🎮
+              </div>
+              <h3 class="font-bold text-slate-800 mb-1.5" data-i18n="pillarGamesTitle">Cognitive Mini-Games</h3>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed" data-i18n="pillarGamesDesc">
+                Tests short-term visual memory, psychomotor speed, and executive Trail-Making function.
+              </p>
+            </div>
+
+            <!-- Pillar 2 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+              <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-2xl mb-3">
+                🎙️
+              </div>
+              <h3 class="font-bold text-slate-800 mb-1.5" data-i18n="pillarVoiceTitle">Voice Biomarkers</h3>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed" data-i18n="pillarVoiceDesc">
+                Analyzes speech rate, pauses, and lexical recall using vocal acoustic parameters.
+              </p>
+            </div>
+
+            <!-- Pillar 3 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+              <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl mb-3">
+                ⌚
+              </div>
+              <h3 class="font-bold text-slate-800 mb-1.5" data-i18n="pillarSensorTitle">Wearable IoT Wristband</h3>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed" data-i18n="pillarSensorDesc">
+                Monitors resting/postural tremors with MPU6050 and pulse variability with MAX30100.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- STEP 1: PARTICIPANT PROFILE                -->
+      <!-- ========================================== -->
+      <section id="step-patient" class="step-section hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm max-w-lg mx-auto">
+          
+          <div class="text-center mb-6">
+            <span class="text-3xl mb-2 inline-block">👤</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800" data-i18n="participantTitle">Participant Details</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1" data-i18n="participantSub">Please enter details for the screening session record.</p>
+          </div>
+
+          <form id="patient-form" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="nameLabel">Full Name</label>
+              <input 
+                id="input-patient-name" 
+                type="text" 
+                required 
+                class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm font-medium"
+                data-i18n-placeholder="namePlaceholder"
+                placeholder="e.g. Ramachandran K"
+              >
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="ageLabel">Age (Years)</label>
+                <input 
+                  id="input-patient-age" 
+                  type="number" 
+                  min="40" 
+                  max="110" 
+                  required 
+                  class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm font-medium"
+                  data-i18n-placeholder="agePlaceholder"
+                  placeholder="e.g. 68"
+                >
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="genderLabel">Gender</label>
+                <select id="select-patient-gender" class="w-full px-3 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm font-medium bg-white">
+                  <option value="Male" data-i18n="genderMale">Male</option>
+                  <option value="Female" data-i18n="genderFemale">Female</option>
+                  <option value="Other" data-i18n="genderOther">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="eduLabel">Education Level</label>
+              <select id="select-patient-edu" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm font-medium bg-white">
+                <option value="Graduate / Degree" data-i18n="eduGraduate">Graduate / Degree</option>
+                <option value="High School" data-i18n="eduHighSchool">High School</option>
+                <option value="Post-Graduate" data-i18n="eduPostGrad">Post-Graduate</option>
+                <option value="Primary / Basic Literacy" data-i18n="eduBasic">Primary / Basic Literacy</option>
+              </select>
+            </div>
+
+            <!-- Mini-Cog Initial Registration Box -->
+            <div class="bg-teal-50 border border-teal-200 rounded-2xl p-4 my-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-teal-800 block mb-1">
+                📌 Memory Registration (Important)
+              </span>
+              <p class="text-xs sm:text-sm text-teal-900 leading-relaxed">
+                Please remember these 3 words carefully. You will be asked to identify them later:
+              </p>
+              <div class="flex items-center justify-around font-bold text-teal-950 text-base sm:text-lg mt-2 py-2 bg-white rounded-xl shadow-xs border border-teal-100">
+                <span>🍎 Apple</span>
+                <span>🪑 Table</span>
+                <span>🪙 Penny</span>
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition cursor-pointer text-sm sm:text-base"
+              data-i18n="btnBeginGames"
+            >
+              Begin Cognitive Games →
+            </button>
+          </form>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- STEP 2: GAME 1 - MEMORY MATCH             -->
+      <!-- ========================================== -->
+      <section id="step-memory" class="step-section hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm">
+          
+          <div class="text-center max-w-lg mx-auto mb-4">
+            <span class="text-xs font-bold text-teal-600 tracking-wider uppercase">Stage 1 of 5</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-0.5" data-i18n="memoryTitle">Test 1: Visual Memory Match</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1" data-i18n="memoryInstruction">
+              Flip the cards and find matching pairs of familiar objects. Try to memorize card locations!
+            </p>
+          </div>
+
+          <!-- Stats bar -->
+          <div class="flex justify-center items-center gap-6 text-xs sm:text-sm font-semibold text-slate-600 mb-4 bg-slate-50 py-2.5 px-4 rounded-2xl max-w-sm mx-auto border border-slate-200">
+            <div>
+              <span data-i18n="memoryFlips">Flips:</span> 
+              <strong id="memory-flips-val" class="text-teal-700 font-bold ml-1">0</strong>
+            </div>
+            <div>
+              <span data-i18n="memoryPairs">Matched:</span> 
+              <strong id="memory-pairs-val" class="text-teal-700 font-bold ml-1">0/4</strong>
+            </div>
+            <div>
+              <span data-i18n="memoryTime">Time:</span> 
+              <strong id="memory-time-val" class="text-teal-700 font-bold ml-1">0s</strong>
+            </div>
+          </div>
+
+          <!-- Game Cards Container -->
+          <div id="memory-game-container"></div>
+
+          <!-- Next Button (revealed on completion) -->
+          <div class="text-center mt-6">
+            <button 
+              id="btn-next-to-trail" 
+              type="button" 
+              class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition cursor-pointer text-sm sm:text-base animate-bounce"
+              data-i18n="btnNextTrail"
+            >
+              Proceed to Speed & Trail Test →
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- STEP 3: GAME 2 - TRAIL MAKING SPEED       -->
+      <!-- ========================================== -->
+      <section id="step-trail" class="step-section hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm">
+          
+          <div class="text-center max-w-lg mx-auto mb-4">
+            <span class="text-xs font-bold text-teal-600 tracking-wider uppercase">Stage 2 of 5</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-0.5" data-i18n="trailTitle">Test 2: Trail-Making Speed & Attention</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1" data-i18n="trailInstruction">
+              Tap the numbered circles in sequential order from 1 to 8 as quickly and accurately as possible.
+            </p>
+          </div>
+
+          <!-- Stats bar -->
+          <div class="flex justify-center items-center gap-6 text-xs sm:text-sm font-semibold text-slate-600 mb-2 bg-slate-50 py-2.5 px-4 rounded-2xl max-w-sm mx-auto border border-slate-200">
+            <div>
+              <span data-i18n="trailTarget">Next:</span> 
+              <strong id="trail-target-val" class="text-amber-600 font-bold ml-1 text-base">1</strong>
+            </div>
+            <div>
+              <span data-i18n="trailErrors">Mistakes:</span> 
+              <strong id="trail-errors-val" class="text-rose-600 font-bold ml-1">0</strong>
+            </div>
+            <div>
+              <span data-i18n="trailTime">Time:</span> 
+              <strong id="trail-time-val" class="text-teal-700 font-bold ml-1">0s</strong>
+            </div>
+          </div>
+
+          <!-- Trail Canvas Container -->
+          <div id="trail-game-container"></div>
+
+          <!-- Next Button -->
+          <div class="text-center mt-6">
+            <button 
+              id="btn-next-to-word" 
+              type="button" 
+              class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition cursor-pointer text-sm sm:text-base animate-bounce"
+              data-i18n="btnNextWord"
+            >
+              Proceed to Word Recall →
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- STEP 4: GAME 3 - WORD RECALL              -->
+      <!-- ========================================== -->
+      <section id="step-word" class="step-section hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm">
+          
+          <div class="text-center max-w-lg mx-auto mb-4">
+            <span class="text-xs font-bold text-teal-600 tracking-wider uppercase">Stage 3 of 5</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-0.5" data-i18n="wordTitle">Test 3: Semantic Word & Category Recall</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1" data-i18n="wordInstruction">
+              Remember these 3 initial items: [ Apple, Table, Penny ]. Select the correct items from the categories below.
+            </p>
+          </div>
+
+          <!-- Word Grid Container -->
+          <div id="word-game-container"></div>
+
+          <!-- Next Button -->
+          <div class="text-center mt-6">
+            <button 
+              id="btn-next-to-voice" 
+              type="button" 
+              class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition cursor-pointer text-sm sm:text-base"
+              data-i18n="btnNextVoice"
+            >
+              Proceed to Voice Assessment →
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- STEP 5: TEST 4 - VOICE BIOMARKERS         -->
+      <!-- ========================================== -->
+      <section id="step-voice" class="step-section hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm max-w-2xl mx-auto">
+          
+          <div class="text-center max-w-lg mx-auto mb-4">
+            <span class="text-xs font-bold text-teal-600 tracking-wider uppercase">Stage 4 of 5</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-0.5" data-i18n="voiceTitle">Test 4: Vocal Fluency & Speech Biomarkers</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1" data-i18n="voiceInstruction">
+              Press Record and speak for 15-30 seconds describing what you see in the illustration below, or your favorite childhood memory.
+            </p>
+          </div>
+
+          <!-- Visual Prompt Scenario Card -->
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4 text-center">
+            <div class="text-4xl mb-2">🏡 ☕ 🌳</div>
+            <p class="text-xs sm:text-sm font-semibold text-slate-700 italic" data-i18n="voicePromptText">
+              Prompt: "Look at the picture of a family having tea in the garden. Describe what everyone is doing in full sentences."
+            </p>
+          </div>
+
+          <!-- Live Audio Waveform Canvas -->
+          <div class="rounded-2xl overflow-hidden shadow-inner mb-4 border border-slate-700 bg-slate-900">
+            <canvas id="voice-waveform-canvas" width="600" height="120" class="w-full h-28 block"></canvas>
+          </div>
+
+          <!-- Recording Controls & Status -->
+          <div class="text-center mb-6">
+            <p id="voice-status-text" class="text-xs text-slate-500 font-medium mb-3">
+              Click the button below to start vocal analysis.
+            </p>
+
+            <button 
+              id="btn-voice-record" 
+              type="button" 
+              class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition cursor-pointer text-sm sm:text-base inline-flex items-center gap-2"
+            >
+              <span>🎙️</span>
+              <span data-i18n="btnStartRecord">Start Recording Voice</span>
+            </button>
+          </div>
+
+          <!-- Live Metrics Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs sm:text-sm mb-6">
+            <div>
+              <span class="text-slate-500 text-xs block" data-i18n="voiceDuration">Duration:</span>
+              <strong id="voice-duration-val" class="text-slate-800 font-bold">0s</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 text-xs block" data-i18n="voicePauses">Hesitations:</span>
+              <strong id="voice-pauses-val" class="text-slate-800 font-bold">0</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 text-xs block">Live Transcript:</span>
+              <span id="voice-transcript-val" class="text-slate-700 italic text-xs truncate block">Waiting for speech...</span>
+            </div>
+          </div>
+
+          <!-- Next Button -->
+          <div class="text-center">
+            <button 
+              id="btn-next-to-sensors" 
+              type="button" 
+              class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition cursor-pointer text-sm sm:text-base"
+              data-i18n="btnNextSensors"
+            >
+              Proceed to Wearable Vitals →
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- STEP 6: STEP 5 - WEARABLE IOT VITALS       -->
+      <!-- ========================================== -->
+      <section id="step-sensor" class="step-section hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm max-w-2xl mx-auto">
+          
+          <div class="text-center max-w-lg mx-auto mb-4">
+            <span class="text-xs font-bold text-teal-600 tracking-wider uppercase">Stage 5 of 5</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-0.5" data-i18n="sensorTitle">Wearable IoT Wristband Telemetry</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1" data-i18n="sensorSub">
+              Real-time physiological signals from ESP32: MPU-6050 (Tremor & Stability) + MAX30100 (Pulse & SpO2).
+            </p>
+          </div>
+
+          <!-- Connectivity & Simulation Controls -->
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-200 mb-4 text-xs">
+            
+            <button 
+              id="btn-connect-ble" 
+              type="button" 
+              class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-2 rounded-xl transition shadow-sm cursor-pointer flex items-center gap-1.5"
+            >
+              <span>📶</span>
+              <span data-i18n="btnConnectBLE">Connect ESP32 (Bluetooth)</span>
+            </button>
+
+            <!-- Simulator Presets -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-slate-500 font-semibold hidden sm:inline">Sim:</span>
+              <button type="button" data-sim-mode="normal" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-teal-600 text-white transition cursor-pointer" data-i18n="simNormal">
+                Normal
+              </button>
+              <button type="button" data-sim-mode="mild" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer" data-i18n="simMild">
+                Mild Tremor
+              </button>
+              <button type="button" data-sim-mode="elevated" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer" data-i18n="simHigh">
+                Elevated Tremor
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Live Graphs -->
+          <div class="space-y-4 mb-6">
+            
+            <!-- Graph 1: MPU6050 Tremor -->
+            <div class="bg-slate-900 rounded-2xl p-3 border border-slate-800 shadow-inner">
+              <div class="flex justify-between items-center text-xs text-slate-300 font-medium mb-1.5 px-1">
+                <span class="flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                  <span data-i18n="accelTitle">Tremor & Motion Stability (MPU-6050 3-Axis)</span>
+                </span>
+                <span id="sensor-status-val" class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+                  Stable
+                </span>
+              </div>
+              <canvas id="accel-canvas" width="600" height="90" class="w-full h-24 block rounded-lg"></canvas>
+            </div>
+
+            <!-- Graph 2: MAX30100 Pulse -->
+            <div class="bg-slate-900 rounded-2xl p-3 border border-slate-800 shadow-inner">
+              <div class="flex justify-between items-center text-xs text-slate-300 font-medium mb-1.5 px-1">
+                <span class="flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span data-i18n="pulseTitle">Photoplethysmography / Pulse Wave (MAX30100)</span>
+                </span>
+                <span class="text-slate-400 text-xs">Arterial Waveform</span>
+              </div>
+              <canvas id="pulse-canvas" width="600" height="90" class="w-full h-24 block rounded-lg"></canvas>
+            </div>
+
+          </div>
+
+          <!-- Real-time Values -->
+          <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center mb-6">
+            <div>
+              <span class="text-slate-500 text-xs block" data-i18n="heartRate">Heart Rate:</span>
+              <strong id="sensor-hr-val" class="text-base sm:text-lg font-black text-slate-800">72 bpm</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 text-xs block" data-i18n="spo2">SpO2 Oxygen:</span>
+              <strong id="sensor-spo2-val" class="text-base sm:text-lg font-black text-slate-800">98%</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 text-xs block" data-i18n="tremorIndex">Tremor Index:</span>
+              <strong id="sensor-tremor-val" class="text-base sm:text-lg font-black text-slate-800">1.1 / 10</strong>
+            </div>
+          </div>
+
+          <!-- Generate Report Button -->
+          <div class="text-center">
+            <button 
+              id="btn-generate-report" 
+              type="button" 
+              class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transition cursor-pointer text-sm sm:text-base flex items-center justify-center gap-2"
+              data-i18n="btnGenerateReport"
+            >
+              <span>📊</span>
+              <span>Generate Multi-Modal Assessment Report →</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- STEP 7: CLINICAL REPORT SUMMARY            -->
+      <!-- ========================================== -->
+      <section id="step-report" class="step-section hidden">
+        <div id="report-container"></div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 px-4 text-center text-xs text-slate-500 print-hide">
+      <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div>
+          <strong>MindPlay</strong> — Dexathon 2026 | Team Technova (DEX26056)
+        </div>
+        <div class="text-[11px] text-slate-400">
+          Smart India Hackathon DK287 Problem Statement Reference
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/i18n.js"></script>
+  <script src="js/games/memoryMatch.js"></script>
+  <script src="js/games/trailMaking.js"></script>
+  <script src="js/games/wordRecall.js"></script>
+  <script src="js/voice/voiceRecorder.js"></script>
+  <script src="js/sensors/sensorManager.js"></script>
+  <script src="js/report/reportView.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
